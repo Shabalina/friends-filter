@@ -8,21 +8,7 @@ gulp-cli
 
 clone this repo
 npm i
-gulp
+npm run gulp (по идее должен и просто gulp работать)
 
-> A Vue.js project
+надо проверить, что сервер запускается с адресом http://localhost/3000/ иначе vk будет ругаться
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-```
-
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
