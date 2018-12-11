@@ -40,17 +40,15 @@ Auth()
        return callAPI('friends.get', {fields: 'photo_100'})
     })
     .then(friends => {
-        //console.log(friends)          
-        //localStorage.clear();
-        console.log(localStorage.length);
-        if (localStorage.length !== 0){
-            renderFromStorage(friends.items);
-        } else {            
+        //console.log(localStorage.length);
+        if (!localStorage.targetData || localStorage.targetData === ''){
             renderFriends(friends, document.querySelector('#friends_template_left').textContent, 
             document.querySelector('#source_list'));
             
             renderFriends({items:[]}, document.querySelector('#friends_template_right').textContent, 
             document.querySelector('#target_list'));
+        } else {
+            renderFromStorage(friends.items);
         }   
 
         var source_zone = document.querySelector('#source_zone');
@@ -75,8 +73,11 @@ document.addEventListener('click', e => {
 })
 
 btn.addEventListener('click', () => {
-    localStorage.clear();
-    console.log(localStorage.length)    
+
+    if(localStorage.targetData){
+    localStorage.targetData = '';
+    //console.log(localStorage.length)    
+    }
     
     let target = document.querySelector('#target_zone');       
     let stringData = [];
@@ -134,13 +135,12 @@ function renderFriends(friends, template, parent) {
 }
 
 function loadStorage(){
-    if(localStorage.length !== 0){
+    if(localStorage.targetData && localStorage.targetData !== ''){
         var id_list = []; 
         for (var elem of localStorage.targetData.split(',')){
             id_list.push(parseInt(elem));
-        }     
-         
-        console.log(id_list)
+        }              
+        //console.log(id_list)
         return id_list.sort(function(a, b){return a - b});  
     }
 }
