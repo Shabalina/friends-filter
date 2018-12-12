@@ -1,6 +1,6 @@
-Simple web app to filter friends in VKontakte social network https://vk.com
+Simple web app to filter friends in VKontakte russian social network https://vk.com
 
-To use it you need to have an account there: https://vk.com.
+To use it you need to be registered here: https://vk.com and to have a handful of friends.
 
 
 When app is opened, it generate a list of tiles, every tile displays name and small profile picture of all user's friends.
