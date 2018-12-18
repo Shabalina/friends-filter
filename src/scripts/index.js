@@ -8,12 +8,13 @@ VK.init({
 
 
 function Auth(){
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         VK.Auth.login(data => {
             if(data.session){
-                resolve()
+                resolve(true)
             } else {
-                reject(new Error('Failed to login'));
+                //reject(new Error('Failed to login'));
+                resolve(false);
             }
         })
     })
@@ -34,20 +35,53 @@ function callAPI(method, params){
 
 }
 
-Auth()
-    .then(() => {
-       // return callAPI('users.get', {})
-       return callAPI('friends.get', {fields: 'photo_100'})
+async function mockOn() {
+    console.error('failed to login, the data will be load from local file');
+        // Parse JSON string into object   
+    var friendsObj = await loadJSON().then(responce => {
+        return JSON.parse(responce);
     })
-    .then(friends => {
-        //console.log(localStorage.length);
+    
+    //console.log(friendsObj);  
+    return friendsObj;      
+}
+ 
+function loadJSON() { 
+    return new Promise((resolve) => {
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('GET', 'assets/data/friends_list.json', true); 
+    xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            resolve(xobj.responseText);
+           }
+    };
+    xobj.send(null); 
+    })
+}
+
+
+
+Auth()
+    .then((answer) => {
+        console.log(answer)
+        if (answer){
+       // return callAPI('users.get', {})    
+            return callAPI('friends.get', {fields: 'photo_100'})
+        }else{
+            new Error('Failed to login');
+            return mockOn();
+        }
+    })
+    .then(friends => {        
         if (!localStorage.targetData || localStorage.targetData === ''){
             renderFriends(friends, document.querySelector('#friends_template_left').textContent, 
             document.querySelector('#source_list'));
             
             renderFriends({items:[]}, document.querySelector('#friends_template_right').textContent, 
             document.querySelector('#target_list'));
-        } else {
+        } else {            
             renderFromStorage(friends.items);
         }   
 
@@ -75,8 +109,7 @@ document.addEventListener('click', e => {
 btn.addEventListener('click', () => {
 
     if(localStorage.targetData){
-    localStorage.targetData = '';
-    //console.log(localStorage.length)    
+    localStorage.targetData = '';    
     }
     
     let target = document.querySelector('#target_zone');       
@@ -105,9 +138,7 @@ function renderFromStorage(vk_items){
     var i = 0;
 
     for(var item of vk_items){
-        if (i < storage_list.length){ 
-            //console.log(item.id)  
-            //console.log(item.last_name)           
+        if (i < storage_list.length){           
             if(item.id === storage_list[i]){
                 right_friends.items.push(item)  
                 console.log(vk_items.length)              
@@ -117,13 +148,13 @@ function renderFromStorage(vk_items){
             }
         } else {            
             left_friends.items.push(item);
-        }        
+        }      
+        
     } 
 
-    console.log(right_friends)
     renderFriends(left_friends, document.querySelector('#friends_template_left').textContent, 
     document.querySelector('#source_list'));
-    
+        
     renderFriends(right_friends, document.querySelector('#friends_template_right').textContent, 
     document.querySelector('#target_list')) 
 }
@@ -139,8 +170,7 @@ function loadStorage(){
         var id_list = []; 
         for (var elem of localStorage.targetData.split(',')){
             id_list.push(parseInt(elem));
-        }              
-        //console.log(id_list)
+        }                
         return id_list.sort(function(a, b){return a - b});  
     }
 }

@@ -2,6 +2,7 @@ const gulp = require('gulp');
 //const pug = require('gulp-pug');
 //const handlebars = require('handlebars');
 //const font = require('gulp-font');
+const connect = require('gulp-connect');
 
 const sass = require('gulp-sass');
 const sassGlob = require('gulp-sass-glob');
@@ -45,6 +46,12 @@ const paths = {
         //src: 'src/scripts/**/*.js',
         src: 'src/scripts/*.js',
         dest: 'build/assets/scripts/'
+    },
+
+    json_files: {
+        //src: 'src/scripts/**/*.js',
+        src: 'src/data/*.json',
+        dest: 'build/assets/data/'
     },
 
     php_scripts: {
@@ -106,6 +113,7 @@ exports.templates = templates;
 exports.styles = styles;
 exports.clean = clean;
 exports.images = images;
+exports.json_files = json_files;
 
 // webpack
 function scripts() {
@@ -121,7 +129,7 @@ function watch() {
     gulp.watch(paths.styles.src, styles);
     gulp.watch(paths.templates.src, templates);
     gulp.watch(paths.images.src, images);
-    //gulp.watch(paths.shaders.src, shaders);
+    gulp.watch(paths.json_files.src, json_files);
     gulp.watch(paths.scripts.src, scripts);
     //gulp.watch(paths.fonts.src, fonts);
     //gulp.watch(paths.php_scripts.src, php_scripts);
@@ -139,6 +147,14 @@ function server() {
 function images() {
     return gulp.src(paths.images.src)
         .pipe(gulp.dest(paths.images.dest));
+}
+
+
+// просто переносим json
+function json_files() {
+    return gulp.src(paths.json_files.src)
+        .pipe(gulp.dest(paths.json_files.dest))
+        .pipe(connect.reload());
 }
 
 //simply transfer php scripts to the root of the build folder
@@ -176,7 +192,7 @@ function sprite(){
 gulp.task('default', gulp.series(
     clean,
     //gulp.parallel(styles, templates, images, php_scripts, shaders, fonts, /*sprite,*/ scripts),
-    gulp.parallel(styles, templates, images, scripts),
+    gulp.parallel(styles, templates, images, json_files, scripts),
     
     gulp.parallel(watch, server)
 ));
